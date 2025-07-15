@@ -6,6 +6,9 @@ WORKDIR /app
 ENV COREPACK_DISABLE_SIGNATURE_CHECKS=1
 ENV COREPACK_ENABLE_NETWORK=0
 
+# Configurar limites de memória para Node.js
+ENV NODE_OPTIONS="--max-old-space-size=4096"
+
 # Instalar pnpm diretamente via npm (bypass do corepack)
 RUN npm install -g pnpm@9.12.0 wrangler
 
@@ -25,8 +28,8 @@ RUN tr -d '\r' < bindings.sh > bindings.tmp && \
     mv bindings.tmp bindings.sh && \
     chmod +x bindings.sh
 
-# Build da aplicação
-RUN pnpm run build
+# Build da aplicação com configurações otimizadas
+RUN NODE_OPTIONS="--max-old-space-size=4096" pnpm run build
 
 # Expor porta
 EXPOSE 5173
