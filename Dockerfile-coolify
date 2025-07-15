@@ -2,6 +2,9 @@ FROM node:20.18.0
 
 WORKDIR /app
 
+# Desabilitar verificação de assinatura do Corepack
+ENV COREPACK_DISABLE_SIGNATURE_CHECKS=1
+
 # Instalar pnpm e wrangler
 RUN corepack enable pnpm && \
     npm install -g wrangler
@@ -9,10 +12,11 @@ RUN corepack enable pnpm && \
 # Copiar arquivos de dependências
 COPY package.json pnpm-lock.yaml ./
 
-# Instalar dependências
-RUN pnpm install
+# Preparar versão específica do pnpm e instalar dependências
+RUN corepack prepare pnpm@9.x --activate && \
+    pnpm install
 
-# Copiar código  fonte e scripts
+# Copiar código fonte e scripts
 COPY . .
 
 # Garantir que o bindings.sh tem permissões de execução e formato correto
@@ -31,6 +35,4 @@ ENV NODE_ENV=production \
     RUNNING_IN_DOCKER=true
 
 # Comando para iniciar usando o script dockerstart
-RUN corepack enable && corepack prepare pnpm@9.x --activate
-RUN pnpm install
-COPY . .
+CMD ["pnpm", "run", "dockerstart"]
