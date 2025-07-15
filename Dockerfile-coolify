@@ -34,4 +34,3 @@ ENV NODE_ENV=production \
 RUN corepack enable && corepack prepare pnpm@9.x --activate
 RUN pnpm install
 COPY . .
-...
