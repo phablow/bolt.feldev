@@ -31,4 +31,7 @@ ENV NODE_ENV=production \
     RUNNING_IN_DOCKER=true
 
 # Comando para iniciar usando o script dockerstart
-CMD ["pnpm", "run", "dockerstart"]
+RUN corepack enable && corepack prepare pnpm@9.x --activate
+RUN pnpm install
+COPY . .
+...
