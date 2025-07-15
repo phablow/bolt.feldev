@@ -2,19 +2,20 @@ FROM node:20.18.0
 
 WORKDIR /app
 
-# Desabilitar verificação de assinatura do Corepack
+# Desabilitar todas as verificações do Corepack
 ENV COREPACK_DISABLE_SIGNATURE_CHECKS=1
+ENV COREPACK_ENABLE_NETWORK=0
 
-# Instalar pnpm e wrangler
-RUN corepack enable pnpm && \
-    npm install -g wrangler
+# Instalar pnpm diretamente via npm (bypass do corepack)
+RUN npm install -g pnpm@9.12.0 wrangler
 
 # Copiar arquivos de dependências
 COPY package.json pnpm-lock.yaml ./
 
-# Preparar versão específica do pnpm e instalar dependências
-RUN corepack prepare pnpm@9.x --activate && \
-    pnpm install
+# Instalar dependências com configurações específicas
+RUN pnpm config set store-dir /root/.pnpm-store && \
+    pnpm config set registry https://registry.npmjs.org/ && \
+    pnpm install --frozen-lockfile --prefer-offline
 
 # Copiar código fonte e scripts
 COPY . .
